@@ -16,7 +16,6 @@
 package pl.com.bottega.ecommerce.sales.domain.offer;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 public class OfferItem {
 
@@ -24,9 +23,7 @@ public class OfferItem {
 
 	private int quantity;
 
-	private BigDecimal totalCost;
-
-	private String currency;
+	private Money totalCost = new Money();
 
 	private Discount discount;
 
@@ -41,11 +38,11 @@ public class OfferItem {
 		this.discount = discount;
 
 		BigDecimal discountValue = new BigDecimal(0);
-		if (discount.discount != null)
-			discountValue = discountValue.subtract(discount.discount);
+		if (discount.getDiscount() != null)
+			discountValue = discountValue.subtract(discount.getDiscount());
 
-		this.totalCost = product.getProductPrice()
-				.multiply(new BigDecimal(quantity)).subtract(discountValue);
+		this.totalCost.setTotalCost(product.getProductPrice()
+				.multiply(new BigDecimal(quantity)).subtract(discountValue));
 	}
 
 	public Product getProduct() {
@@ -53,11 +50,11 @@ public class OfferItem {
 	}
 
 	public BigDecimal getTotalCost() {
-		return totalCost;
+		return totalCost.getTotalCost();
 	}
 
 	public String getTotalCostCurrency() {
-		return currency;
+		return totalCost.getCurrency();
 	}
 
 	public Discount getDiscount() {
@@ -77,7 +74,7 @@ public class OfferItem {
 		result = prime * result + ((product == null) ? 0 : product.hashCode());
 		result = prime * result + quantity;
 		result = prime * result
-				+ ((totalCost == null) ? 0 : totalCost.hashCode());
+				+ ((totalCost.getTotalCost() == null) ? 0 : totalCost.getTotalCost().hashCode());
 		return result;
 	}
 
@@ -102,10 +99,10 @@ public class OfferItem {
 			return false;
 		if (quantity != other.quantity)
 			return false;
-		if (totalCost == null) {
-			if (other.totalCost != null)
+		if (totalCost.getTotalCost() == null) {
+			if (other.totalCost.getTotalCost() != null)
 				return false;
-		} else if (!totalCost.equals(other.totalCost))
+		} else if (!totalCost.getTotalCost().equals(other.totalCost.getTotalCost()))
 			return false;
 		return true;
 	}
@@ -128,12 +125,12 @@ public class OfferItem {
 			return false;
 
 		BigDecimal max, min;
-		if (totalCost.compareTo(other.totalCost) > 0) {
-			max = totalCost;
-			min = other.totalCost;
+		if (totalCost.getTotalCost().compareTo(other.totalCost.getTotalCost()) > 0) {
+			max = totalCost.getTotalCost();
+			min = other.totalCost.getTotalCost();
 		} else {
-			max = other.totalCost;
-			min = totalCost;
+			max = other.totalCost.getTotalCost();
+			min = totalCost.getTotalCost();
 		}
 
 		BigDecimal difference = max.subtract(min);
